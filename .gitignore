@@ -20,6 +20,7 @@ hs_err_pid*
 
 # IntelliJ idea files
 .idea/workspace.xml
-.idea/libraries
-*.iml
+#.idea/libraries
+#*.iml
 target/
+src/test/java/main/
