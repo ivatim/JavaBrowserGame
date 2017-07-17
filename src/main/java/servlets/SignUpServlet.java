@@ -1,5 +1,6 @@
 package servlets;
 
+import enums.AccountStatus;
 import services.AccountService;
 import templater.PageGenerator;
 
@@ -23,13 +24,22 @@ public class SignUpServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String login = req.getParameter("login");
-        String password = req.getParameter("password");
-        String email = req.getParameter("email");
-        Set<Status> statuses = accountService.signUp(login, password, email);
-        resp.setContentType("text/html;charset=utf-8");
-        resp.setStatus(HttpServletResponse.SC_OK);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String login = request.getParameter("login");
+        String password = request.getParameter("password");
+        String email = request.getParameter("email");
+        Set<AccountStatus> accountStatuses = accountService.signUp(login, password, email);
+        response.setContentType("text/html;charset=utf-8");
+        if (accountStatuses.size() == 1 && accountStatuses.contains(AccountStatus.CREATED)) {
+            response.setStatus(HttpServletResponse.SC_CREATED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        }
+        Map<String, Object> pageVariables = new HashMap<>();
+        pageVariables.put("lastLogin", login == null ? "" : login);
+
+        response.getWriter().println(PageGenerator.getPage("authform.html", pageVariables));
+
     }
 
     @Override
@@ -48,28 +58,5 @@ public class SignUpServlet extends HttpServlet {
 //        pageVariables.put("lastLogin", login == null ? "" : login);
 //
 //        response.getWriter().println(PageGenerator.getPage("authform.html", pageVariables));
-    }
-
-    public enum Status {
-        CREATED("successfully created"),
-        EMPTY_LOGIN("empty login"),
-        INVALID_LOGIN("invalid login"),
-        EXISTING_LOGIN("user having such login already exists"),
-        EMPTY_PASSWORD("empty password"),
-        INVALID_PASSWORD("invalid password"),
-        TOO_SHORT_PASSWORD("too short password"),
-        EMPTY_EMAIL("empty email"),
-        INVALID_EMAIL("invalid email"),
-        EXISTING_EMAIL("user having such email already exists");
-
-        private final String text;
-
-        Status(String text) {
-            this.text = text;
-        }
-
-        public String getText() {
-            return text;
-        }
     }
 }

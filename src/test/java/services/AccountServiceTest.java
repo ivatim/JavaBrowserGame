@@ -1,16 +1,17 @@
 package services;
 
+import enums.AccountStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import services.AccountService;
-import servlets.SignUpServlet;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by ivankov on 13.07.2017.
@@ -22,7 +23,7 @@ public class AccountServiceTest {
     private String login;
     private String password;
     private String email;
-    private SignUpServlet.Status[] expectedStatuses;
+    private AccountStatus[] expectedAccountStatuses;
 
     @Before
     public void initialize() {
@@ -30,24 +31,25 @@ public class AccountServiceTest {
     }
 
     public AccountServiceTest(Object[] input, Object[] expectedStatuses) {
-        this.login = (String)input[0];
-        this.password = (String)input[1];
-        this.email = (String)input[2];
-        this.expectedStatuses = Arrays.copyOf(expectedStatuses, expectedStatuses.length, SignUpServlet.Status[].class);
+        this.login = (String) input[0];
+        this.password = (String) input[1];
+        this.email = (String) input[2];
+        this.expectedAccountStatuses = Arrays.copyOf(expectedStatuses, expectedStatuses.length, AccountStatus[].class);
     }
 
     @Parameterized.Parameters
     public static Collection inputs() {
-        return Arrays.asList(new Object[][][] {
-                {{"admin", "adminadmin", "ololo@mail.ru"}, {SignUpServlet.Status.CREATED}},
-                {{"admin", "admin", "ololo@mail.ru"}, {SignUpServlet.Status.EXISTING_LOGIN, SignUpServlet.Status.TOO_SHORT_PASSWORD}},
-                {{"", "adminshaasdffd", "ololo@mail.ru"}, {SignUpServlet.Status.EMPTY_LOGIN}},
-                {{"ololosha", "fucjiasdf", "privetmail.ru"}, {SignUpServlet.Status.INVALID_EMAIL}}
+        return Arrays.asList(new Object[][][]{
+                {{"admin", "adminadmin", "ololo@mail.ru"}, {AccountStatus.CREATED}},
+                {{"admin", "admin", "ololo@mail.ru"}, {AccountStatus.EXISTING_LOGIN, AccountStatus.TOO_SHORT_PASSWORD}},
+                {{"", "adminshaasdffd", "ololo@mail.ru"}, {AccountStatus.EMPTY_LOGIN}},
+                {{"ololosha", "fucjiasdf", "privetmail.ru"}, {AccountStatus.INVALID_EMAIL}}
         });
     }
 
     @Test
     public void testSignUp() throws Exception {
-        assertArrayEquals(expectedStatuses, accountService.signUp(login, password, email).toArray());
+        Set<AccountStatus> actualAccountStatuses = accountService.signUp(login, password, email);
+        assertThat(actualAccountStatuses, containsInAnyOrder(expectedAccountStatuses));
     }
 }
