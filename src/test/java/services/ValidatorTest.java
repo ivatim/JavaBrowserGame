@@ -24,7 +24,7 @@ public class ValidatorTest {
     private String email;
 
     @Before
-    public void initialize() {
+    public void setUp() {
         Set<AccountStatus> statuses = new HashSet<>();
         validator = new Validator(statuses);
     }

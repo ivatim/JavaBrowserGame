@@ -23,4 +23,5 @@ hs_err_pid*
 .idea/libraries
 *.iml
 target/
+out/
 src/test/java/main/

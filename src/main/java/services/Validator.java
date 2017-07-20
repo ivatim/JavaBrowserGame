@@ -1,5 +1,7 @@
 package services;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import enums.AccountStatus;
 
 import java.util.HashSet;
@@ -44,7 +46,9 @@ public class Validator {
     }
 
     private void isExistingLogin(String login) {
-        if (AccountService.getUserMap().containsKey(login))
+        // TODO
+        // IMPL????
+        if (AccountServiceImpl.getUserMap().containsKey(login))
             accountStatuses.add(AccountStatus.EXISTING_LOGIN);
     }
 

@@ -1,6 +1,7 @@
 package services;
 
 import enums.AccountStatus;
+import interfaces.AccountService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertThat;
  */
 
 @RunWith(Parameterized.class)
-public class AccountServiceTest {
+public class AccountServiceImplTest {
     private AccountService accountService;
     private String login;
     private String password;
@@ -26,11 +27,11 @@ public class AccountServiceTest {
     private AccountStatus[] expectedAccountStatuses;
 
     @Before
-    public void initialize() {
-        accountService = new AccountService();
+    public void setUp() {
+        accountService = new AccountServiceImpl();
     }
 
-    public AccountServiceTest(Object[] input, Object[] expectedStatuses) {
+    public AccountServiceImplTest(Object[] input, Object[] expectedStatuses) {
         this.login = (String) input[0];
         this.password = (String) input[1];
         this.email = (String) input[2];
@@ -39,12 +40,13 @@ public class AccountServiceTest {
 
     @Parameterized.Parameters
     public static Collection inputs() {
-        return Arrays.asList(new Object[][][]{
+        Object[][][] objects = {
                 {{"admin", "adminadmin", "ololo@mail.ru"}, {AccountStatus.CREATED}},
                 {{"admin", "admin", "ololo@mail.ru"}, {AccountStatus.EXISTING_LOGIN, AccountStatus.TOO_SHORT_PASSWORD}},
                 {{"", "adminshaasdffd", "ololo@mail.ru"}, {AccountStatus.EMPTY_LOGIN}},
                 {{"ololosha", "fucjiasdf", "privetmail.ru"}, {AccountStatus.INVALID_EMAIL}}
-        });
+        };
+        return Arrays.asList(objects);
     }
 
     @Test

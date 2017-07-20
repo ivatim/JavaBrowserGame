@@ -1,7 +1,10 @@
 package servlets;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import enums.AccountStatus;
-import services.AccountService;
+import interfaces.AccountService;
+import services.AccountServiceImpl;
 import templater.PageGenerator;
 
 import javax.servlet.ServletException;
@@ -17,6 +20,7 @@ import java.util.Set;
  * @author Igor Ivankov
  */
 public class SignUpServlet extends HttpServlet {
+    public static final String SIGN_UP_PAGE_URL = "/signup";
     private AccountService accountService;
 
     public SignUpServlet(AccountService accountService) {

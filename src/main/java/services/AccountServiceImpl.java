@@ -1,6 +1,9 @@
 package services;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import enums.AccountStatus;
+import interfaces.AccountService;
 import main.User;
 
 import java.util.*;
@@ -8,9 +11,10 @@ import java.util.*;
 /**
  * Created by ivankov on 13.07.2017.
  */
-public class AccountService {
+public class AccountServiceImpl implements AccountService {
     private static Map<String, User> userMap = new HashMap<>();
 
+    @Override
     public Set<AccountStatus> signUp(String login, String password, String email) {
         Set<AccountStatus> accountStatuses = new HashSet<>();
 
@@ -34,6 +38,7 @@ public class AccountService {
         userMap.put(login, newUser);
     }
 
+    @Override
     public Set<AccountStatus> signIn(String login, String password) {
         Set<AccountStatus> accountStatuses = new HashSet<>();
 

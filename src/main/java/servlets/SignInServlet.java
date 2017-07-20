@@ -1,7 +1,8 @@
 package servlets;
 
 import enums.AccountStatus;
-import services.AccountService;
+import interfaces.AccountService;
+import services.AccountServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +15,7 @@ import java.util.Set;
  * Created by ivankov on 13.07.2017.
  */
 public class SignInServlet extends HttpServlet {
+    public static final String SIGN_IN_PAGE_URL = "/signin";
     AccountService accountService;
 
     public SignInServlet(AccountService accountService) {

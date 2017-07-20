@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import services.AccountService;
+import services.AccountServiceImpl;
 import templater.PageGenerator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,18 +44,18 @@ public class SignUpServletTest {
 
         when(response.getWriter()).thenReturn(printWriter);
 
-        SignUpServlet signUpServlet = new SignUpServlet(new AccountService());
+        SignUpServlet signUpServlet = new SignUpServlet(new AccountServiceImpl());
         signUpServlet.doGet(request, response);
         String result = stringWriter.getBuffer().toString().trim();
 
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("lastLogin", "User1");
         assertEquals(result, PageGenerator.getPage("authform.html", pageVariables));
-
     }
 
     @Test
     public void testDoPost() throws Exception {
+        // TODO
     }
 
 }
