@@ -1,7 +1,8 @@
 package main;
 
-import interfaces.AccountService;
-import org.apache.logging.log4j.Level;
+import game.mechanics.GameMechanics;
+import game.mechanics.GameMechanicsImpl;
+import service.account.AccountService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Handler;
@@ -10,10 +11,12 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import services.AccountServiceImpl;
-import servlets.AdminServlet;
-import servlets.SignInServlet;
-import servlets.SignUpServlet;
+import service.account.AccountServiceImpl;
+import service.auth.AuthService;
+import service.auth.AuthServiceImpl;
+import service.websocket.WebSocketService;
+import service.websocket.WebSocketServiceImpl;
+import servlet.*;
 
 import javax.servlet.Servlet;
 
@@ -28,17 +31,36 @@ public class Main {
     public static final String RESOURCE_BASE = "static";
 
     public static void main(String[] args) throws Exception {
+        // TODO
+        // use context in constructors
+        Context context = new Context();
+
+        WebSocketService webSocketService = new WebSocketServiceImpl();
+        context.add(webSocketService);
+        GameMechanics gameMechanics = new GameMechanicsImpl(webSocketService);
 
         AccountService accountService = new AccountServiceImpl();
+        context.add(accountService);
+
+        AuthService authService = new AuthServiceImpl();
+        context.add(authService);
 
         Servlet signUpServlet = new SignUpServlet(accountService);
         Servlet signInServlet = new SignInServlet(accountService);
         Servlet adminServlet = new AdminServlet(accountService);
+        Servlet chatWebSocketServlet = new ChatWebSocketServlet();
+        Servlet gameServlet = new GameServlet(gameMechanics, authService);
+        Servlet gameWebSocketServlet = new GameWebSocketServlet(authService, gameMechanics, webSocketService);
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(signUpServlet), SignUpServlet.SIGN_UP_PAGE_URL);
         servletContextHandler.addServlet(new ServletHolder(signInServlet), SignInServlet.SIGN_IN_PAGE_URL);
         servletContextHandler.addServlet(new ServletHolder(adminServlet), AdminServlet.ADMIN_PAGE_URL);
+        // TODO
+        // hardcode url
+        servletContextHandler.addServlet(new ServletHolder(chatWebSocketServlet), "/chat");
+        servletContextHandler.addServlet(new ServletHolder(gameServlet), GameServlet.GAME_PAGE_URL);
+        servletContextHandler.addServlet(new ServletHolder(gameWebSocketServlet), GameWebSocketServlet.GAME_WEB_SOCKET_URL);
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
@@ -51,14 +73,9 @@ public class Main {
         Server server = new Server(port);
         server.setHandler(handlerList);
 
-        logger.log(Level.TRACE,"tracefffff");
-        logger.log(Level.DEBUG,"DEBUGaerf");
-        logger.log(Level.INFO,"INFOerwer");
-        logger.info("WIHTOUT LEVEL");
-        logger.log(Level.WARN,"WARNwer");
-        logger.log(Level.ERROR,"ERrowerr");
-        logger.log(Level.FATAL,"FAtal");
         server.start();
-        server.join();
+
+//        server.join();
+        gameMechanics.run();
     }
 }
