@@ -28,73 +28,74 @@ public class Validator {
     }
 
     private void validateLogin(String login) {
-        isEmptyLogin(login);
-        isInvalidLogin(login);
-        isExistingLogin(login);
-    }
-
-    private void isEmptyLogin(String login) {
-        if (login.isEmpty())
+        if (isEmptyLogin(login)) {
             accountStatuses.add(AccountStatus.EMPTY_LOGIN);
-    }
-
-    private void isInvalidLogin(String login) {
-        // TODO
-        if (false)
+        } else if (isInvalidLogin(login)) {
             accountStatuses.add(AccountStatus.INVALID_LOGIN);
+        } else if (isExistingLogin(login)) {
+            accountStatuses.add(AccountStatus.EXISTING_LOGIN);
+        }
     }
 
-    private void isExistingLogin(String login) {
+    private boolean isEmptyLogin(String login) {
+        return login == null || login.isEmpty();
+    }
+
+    private boolean isInvalidLogin(String login) {
+        // TODO
+        return true;
+    }
+
+    private boolean isExistingLogin(String login) {
         // TODO
         // IMPL????
-        if (AccountServiceImpl.getUserMap().containsKey(login))
-            accountStatuses.add(AccountStatus.EXISTING_LOGIN);
+        return AccountServiceImpl.getUserMap().containsKey(login);
     }
 
     private void validatePassword(String password) {
-        isEmptyPassword(password);
-        isTooShortPassword(password);
-    }
-
-    private void isEmptyPassword(String password) {
-        if (password.isEmpty())
+        if (isEmptyPassword(password)) {
             accountStatuses.add(AccountStatus.EMPTY_PASSWORD);
-    }
-
-    private void isInvalidPassword(String password) {
-        // TODO
-        if (false)
-            accountStatuses.add(AccountStatus.INVALID_PASSWORD);
-    }
-
-    private void isTooShortPassword(String password) {
-        if (password.length() < 8) {
+        } else if (isTooShortPassword(password)) {
             accountStatuses.add(AccountStatus.TOO_SHORT_PASSWORD);
+        } else if (isInvalidPassword(password)) {
+            accountStatuses.add(AccountStatus.INVALID_PASSWORD);
         }
+    }
+
+    private boolean isEmptyPassword(String password) {
+        return password == null || password.isEmpty();
+    }
+
+    private boolean isTooShortPassword(String password) {
+        return password.length() < 8;
+    }
+
+    private boolean isInvalidPassword(String password) {
+        // TODO
+        return false;
     }
 
     private void validateEmail(String email) {
-        isEmptyEmail(email);
-        isInvalidEmail(email);
-        isExistingEmail(email);
-    }
-
-    private void isEmptyEmail(String email) {
-        if (email.isEmpty()) {
+        if (isEmptyEmail(email)) {
             accountStatuses.add(AccountStatus.EMPTY_EMAIL);
-        }
-    }
-
-    private void isInvalidEmail(String email) {
-        if (!email.contains("@") || !email.contains(".")) {
+        } else if (isInvalidEmail(email)) {
             accountStatuses.add(AccountStatus.INVALID_EMAIL);
+        } else if (isExistingEmail(email)) {
+            accountStatuses.add(AccountStatus.EXISTING_EMAIL);
         }
     }
 
-    private void isExistingEmail(String email) {
+    private boolean isEmptyEmail(String email) {
+        return email == null || email.isEmpty();
+    }
+
+    private boolean isInvalidEmail(String email) {
+        return !email.contains("@") || !email.contains(".");
+    }
+
+    private boolean isExistingEmail(String email) {
         // TODO
-        if (false)
-            accountStatuses.add(AccountStatus.EXISTING_EMAIL);
+        return false;
     }
 
     public Set<AccountStatus> getAccountStatuses() {

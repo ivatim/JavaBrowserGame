@@ -1,8 +1,9 @@
 package main;
 
+import entity.resource.GameSettings;
+import entity.resource.ServerSettings;
 import game.mechanics.GameMechanics;
 import game.mechanics.GameMechanicsImpl;
-import service.account.AccountService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Handler;
@@ -11,6 +12,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import service.account.AccountService;
 import service.account.AccountServiceImpl;
 import service.auth.AuthService;
 import service.auth.AuthServiceImpl;
@@ -19,17 +21,20 @@ import service.websocket.WebSocketServiceImpl;
 import servlet.*;
 
 import javax.servlet.Servlet;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Igor Ivankov
  */
 public class Main {
+    @SuppressWarnings("ConstantNamingConvention")
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final Logger logger = LogManager.getLogger(Main.class.getSimpleName());
-
-    public static final int DEFAULT_PORT = 8888;
+//    public static final int DEFAULT_PORT = 8888;
     public static final String RESOURCE_BASE = "static";
+    private static final String PATH_TO_PROPERTIES = "server.properties";
 
+    @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
         // TODO
         // use context in constructors
@@ -37,7 +42,9 @@ public class Main {
 
         WebSocketService webSocketService = new WebSocketServiceImpl();
         context.add(webSocketService);
-        GameMechanics gameMechanics = new GameMechanicsImpl(webSocketService);
+        ResourceFactory.getInstance().loadAllResources("src/main/res");
+        GameSettings gameSettings = (GameSettings) ResourceFactory.getInstance().getResource("GameSettings");
+        GameMechanics gameMechanics = new GameMechanicsImpl(webSocketService, gameSettings);
 
         AccountService accountService = new AccountServiceImpl();
         context.add(accountService);
@@ -69,7 +76,10 @@ public class Main {
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[]{resourceHandler, servletContextHandler});
 
-        int port = args.length == 1 ? Integer.valueOf(args[0]) : DEFAULT_PORT;
+
+        ServerSettings serverSettings = (ServerSettings) ResourceFactory.getInstance().getResource("ServerSettings");
+        int port = serverSettings.getPort();
+//        int port = args.length == 1 ? Integer.valueOf(args[0]) : DEFAULT_PORT;
         Server server = new Server(port);
         server.setHandler(handlerList);
 

@@ -15,14 +15,15 @@ import static org.junit.Assert.*;
 
 public class ValidatorTest {
     private Validator validator;
+    Set<AccountStatus> statuses;
     private String login;
     private String password;
     private String email;
 
     @Before
     public void setUp() {
-        Set<AccountStatus> statuses = new HashSet<>();
         validator = new Validator(statuses);
+        statuses = new HashSet<>();
     }
 
     @Test

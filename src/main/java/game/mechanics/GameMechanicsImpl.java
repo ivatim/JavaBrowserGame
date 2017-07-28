@@ -2,31 +2,37 @@ package game.mechanics;
 
 import entity.game.GameSession;
 import entity.game.Player;
+import entity.resource.GameSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import service.websocket.WebSocketService;
 import util.TimeHelper;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class GameMechanicsImpl implements GameMechanics {
+    @SuppressWarnings("ConstantNamingConvention")
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final int STEP_TIME = 100;
+    private static final int GAME_TIME = 15 * 1000;
 
-    private static final int gameTime = 15 * 1000;
-
+    private GameSettings gameSettings;
     private WebSocketService webSocketService;
-
     private Map<String, GameSession> nameToGame = new HashMap<>();
-
     private Set<GameSession> allSessions = new HashSet<>();
-
     private String waiter;
 
-    public GameMechanicsImpl(WebSocketService webSocketService) {
+    public GameMechanicsImpl(WebSocketService webSocketService, GameSettings gameSettings) {
         this.webSocketService = webSocketService;
+        this.gameSettings = gameSettings;
     }
 
+    @Override
     public void addPlayer(String user) {
         if (waiter != null) {
             starGame(user);
@@ -36,6 +42,7 @@ public class GameMechanicsImpl implements GameMechanics {
         }
     }
 
+    @Override
     public void incrementScore(String userName) {
         GameSession myGameSession = nameToGame.get(userName);
         Player myUser = myGameSession.getSelf(userName);
@@ -44,6 +51,9 @@ public class GameMechanicsImpl implements GameMechanics {
         enemyUser.incrementEnemyScore();
         webSocketService.notifyMyNewScore(myUser);
         webSocketService.notifyEnemyNewScore(enemyUser);
+        if (myUser.getMyScore() == gameSettings.getScoreToWin()) {
+            logger.debug("winner!");
+        }
     }
 
     @Override
@@ -56,7 +66,7 @@ public class GameMechanicsImpl implements GameMechanics {
 
     private void gmStep() {
         for (GameSession session : allSessions) {
-            if (session.getSessionTime() > gameTime) {
+            if (session.getSessionTime() > GAME_TIME) {
                 boolean firstWin = session.isFirstWin();
                 webSocketService.notifyGameOver(session.getFirst(), firstWin);
                 webSocketService.notifyGameOver(session.getSecond(), !firstWin);

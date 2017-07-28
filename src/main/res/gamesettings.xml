@@ -1,0 +1,4 @@
+<class type='entity.resource.GameSettings'>
+    <maxTime>10000</maxTime>
+    <scoreToWin>1000</scoreToWin>
+</class>
