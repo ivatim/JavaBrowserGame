@@ -5,3 +5,12 @@ body{
     background-size: cover;
     background-position: bottom;
     background-attachment: fixed;}
+
+.user_auth{
+      padding: 2px; /* Поля вокруг текста */
+      color: green;/* Цвет текста */
+      font-weight:bold}
+
+.user_error{
+    color:red;
+    font-weight bold;}
